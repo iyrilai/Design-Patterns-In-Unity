@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Design-Patterns-In-Unity.sln"
+    "dotnet.defaultSolution": "DesignPatterns.sln"
 }
