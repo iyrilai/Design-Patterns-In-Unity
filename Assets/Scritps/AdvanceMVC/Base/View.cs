@@ -61,6 +61,7 @@ namespace Mouizeroo.AdvanceMVC.Base
         {
             ControllerManager.Instance.Unregister(Controller);
             Controller?.OnDestroy();
+            Controller = null;
         }
 
         void OnCollisionEnter2D(Collision2D collision)
