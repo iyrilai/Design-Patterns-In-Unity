@@ -1,4 +1,4 @@
-namespace Mouizeroo.AdvanceMVC.Base
+namespace CompanyName.ProjectName.Base
 {
     /// <summary>
     /// Model store data

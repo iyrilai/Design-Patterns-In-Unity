@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Mouizeroo.AdvanceMVC.Base;
+using CompanyName.ProjectName.Base;
 using UnityEngine;
 
-namespace Mouizeroo.AdvanceMVC.Managers
+namespace CompanyName.ProjectName.Managers
 {
     public class ControllerManager : IManager
     {
@@ -22,23 +22,51 @@ namespace Mouizeroo.AdvanceMVC.Managers
             }
         }
 
-        readonly List<IController> controllers = new();
+        readonly List<Controller> controllers = new();
 
         public Task Init() { return null; }
 
-        public void Register(IController controller)
+        public void Register(Controller controller)
         {
             if (!controllers.Contains(controller))
                 controllers.Add(controller);
         }
 
-        public void Unregister(IController controller)
+        public void Unregister(Controller controller)
         {
             if (controllers.Contains(controller))
                 controllers.Remove(controller);
         }
 
-        public T GetController<T>() where T : IController
+        public void Update()
+        {
+            for (int i = 0; i < controllers.Count; i++)
+            {
+                var controller = controllers[i];
+                try
+                {
+                    var gameUpdate = (IGameUpdate)controller;
+                    gameUpdate.Update();
+                }
+                catch { }
+            }
+        }
+
+        public void FixedUpdate()
+        {
+            for (int i = 0; i < controllers.Count; i++)
+            {
+                var controller = controllers[i];
+                try
+                {
+                    var gameUpdate = (IGameUpdate)controller;
+                    gameUpdate.FixedUpdate();
+                }
+                catch { }
+            }
+        }
+
+        public T GetController<T>() where T : Controller
         {
             foreach (var controller in controllers)
             {
@@ -49,27 +77,31 @@ namespace Mouizeroo.AdvanceMVC.Managers
             throw new System.Exception("Controller Not Found");
         }
 
-        public T GetController<T>(GameObject @object) where T : IController
+        public T CreateController<T>() where T : Controller, new()
         {
-            try
-            {
-                var controller = @object.GetComponent<View>().GetController<T>();
-                if (controller != null)
-                {
-                    return controller;
-                }
-            }
-            catch { }
+            var controller = Controller.CreateContoller<T>();
 
-            throw new System.Exception("Controller Not Found");
+            return controller;
         }
 
-        public T ViewGenerator<T>() where T : View
+        /// <summary>
+        /// Get view from gameobject and create the controller
+        /// </summary>
+        public T CreateController<T, U>(GameObject gameObject) where T : Controller, new() where U : View
         {
-            var type = typeof(T);
-            var obj = new GameObject(type.Name, type);
+            var view = gameObject.GetComponent<U>();
+            var controller = Controller.CreateContoller<T>(view);
 
-            return obj.GetComponent<T>();
+            return controller;
+        }
+
+        /// <summary>
+        /// Create new gameobject with given reference
+        /// </summary>
+        public T CreateControllerWithRef<T, U>(GameObject _ref) where T : Controller, new() where U : View
+        {
+            var instance = Object.Instantiate(_ref);
+            return CreateController<T, U>(instance);
         }
     }
 }

@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Mouizeroo.AdvanceMVC.Base
+namespace CompanyName.ProjectName.Base
 {
     public interface IManager
     {
