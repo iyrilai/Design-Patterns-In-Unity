@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CompanyName.ProjectName.Base;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace CompanyName.ProjectName.Managers
 {
@@ -23,6 +25,7 @@ namespace CompanyName.ProjectName.Managers
         }
 
         readonly List<Controller> controllers = new();
+        readonly Dictionary<Type, Controller> controllersMap = new();
 
         public Task Init() { return null; }
 
@@ -30,12 +33,16 @@ namespace CompanyName.ProjectName.Managers
         {
             if (!controllers.Contains(controller))
                 controllers.Add(controller);
+
+            controllersMap.TryAdd(controller.GetType(), controller);
         }
 
         public void Unregister(Controller controller)
         {
             if (controllers.Contains(controller))
                 controllers.Remove(controller);
+
+            controllersMap.Remove(controller.GetType());
         }
 
         public void Update()
@@ -68,13 +75,12 @@ namespace CompanyName.ProjectName.Managers
 
         public T GetController<T>() where T : Controller
         {
-            foreach (var controller in controllers)
+            if (controllersMap.TryGetValue(typeof(T), out var controller))
             {
-                if (controller is T typedController)
-                    return typedController;
+                return (T)controller;
             }
 
-            throw new System.Exception("Controller Not Found");
+            throw new Exception("Controller Not Found");
         }
 
         public T CreateController<T>() where T : Controller, new()
